@@ -25,7 +25,8 @@
         "illuminate/container": "^6.0|^8.0|^9.0",
         "illuminate/contracts": "^6.0|^8.0|^9.0",
         "illuminate/database": "^6.0|^8.0|^9.0",
-        "laravel/serializable-closure": "^1.0"
+        "laravel/serializable-closure": "^1.0",
+        "ryangjchandler/orbit": "^1.1"
     },
     "autoload": {
         "psr-4": {

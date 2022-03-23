@@ -6,13 +6,15 @@ use Illuminate\Database\Schema\Blueprint;
 use MagicLink\MagicLinkServiceProvider;
 use MagicLink\Test\TestSupport\User;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Orbit\OrbitServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
     public function setUp(): void
     {
         parent::setUp();
-
+        $this->withoutExceptionHandling();
+        
         $this->setUpDatabase($this->app);
     }
 
@@ -24,6 +26,7 @@ abstract class TestCase extends Orchestra
     {
         return [
             MagicLinkServiceProvider::class,
+            OrbitServiceProvider::class,
         ];
     }
 
@@ -47,6 +50,10 @@ abstract class TestCase extends Orchestra
             'root'   => __DIR__.'/stubs/storage/app_alternative',
         ]);
 
+        \Config::set('orbit.paths.content', __DIR__.'/stubs/storage/app/db');
+        \Config::set('orbit.paths.cache', __DIR__.'/stubs/storage/app/cache');
+        \Config::set('orbit.default', 'json');
+
         $app['config']->set('database.connections.sqlite', [
             'driver'   => 'sqlite',
             'database' => ':memory:',
@@ -54,31 +61,7 @@ abstract class TestCase extends Orchestra
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ]);
 
-        $app['config']->set('database.connections.pgsql', [
-            'driver'   => 'pgsql',
-            'host' => '127.0.0.1',
-            'port' => '54320',
-            'username' => 'postgres',
-            'password' => 'mysecretpassword',
-            'database' => 'test',
-        ]);
-
-        $app['config']->set('database.connections.mysql', [
-            'driver'   => 'mysql',
-            'host' => '127.0.0.1',
-            'port' => '3306',
-            'username' => 'root',
-            'password' => '',
-            'database' => 'test',
-        ]);
-
         $app['config']->set('database.default', 'sqlite');
-
-        if (getenv('DB_DRIVER') === 'pgsql') {
-            $app['config']->set('database.default', 'pgsql');
-        } elseif (getenv('DB_DRIVER') === 'mysql') {
-            $app['config']->set('database.default', 'mysql');
-        }
     }
 
     /**
@@ -88,24 +71,20 @@ abstract class TestCase extends Orchestra
      */
     protected function setUpDatabase($app)
     {
-        if ($app['config']->get('database.default') !== 'sqlite') {
-            $app['db']->connection()->getSchemaBuilder()->dropIfExists('users');
-            $app['db']->connection()->getSchemaBuilder()->dropIfExists('migrations');
-            $app['db']->connection()->getSchemaBuilder()->dropIfExists('magic_links');
-        }
+        \File::cleanDirectory(__DIR__.'/stubs/storage/app/db');
+        \File::cleanDirectory(__DIR__.'/stubs/storage/app/cache');
 
-        $this->artisan('migrate');
-
-        $app['db']->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('email');
-        });
-
-        User::create(['email' => 'test@user.com']);
+        $user = User::create(['email' => 'test@user.com']);
     }
 
     protected function loadRoutes()
     {
         include __DIR__.'/stubs/routes.php';
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        \File::deleteDirectory(__DIR__.'/stubs/storage/app/db');
+        \File::deleteDirectory(__DIR__.'/stubs/storage/app/cache');
     }
 }

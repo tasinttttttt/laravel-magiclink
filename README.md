@@ -1,5 +1,5 @@
 
-# MagicLink for Laravels App
+# MagicLink for Flat File Orbit Laravels App
 
 Through the `MagicLink` class we can create a secure link that later
 being visited will perform certain actions, which will allow us
@@ -33,13 +33,6 @@ You can install this package via composer using:
 
 ```bash
 composer require cesargb/laravel-magiclink
-```
-
-You can then create the table by running the
-migrations:
-
-```bash
-php artisan migrate
 ```
 
 Note: If you have the version 1 installed,

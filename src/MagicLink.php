@@ -5,12 +5,14 @@ namespace MagicLink;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use MagicLink\Actions\ActionAbstract;
 use MagicLink\Events\MagicLinkWasCreated;
 use MagicLink\Events\MagicLinkWasVisited;
+use Orbit\Concerns\Orbital;
 
 /**
  * @property string $token
@@ -21,7 +23,25 @@ use MagicLink\Events\MagicLinkWasVisited;
  */
 class MagicLink extends Model
 {
-    use AccessCode;
+    public static $driver = 'json';
+
+    use AccessCode, Orbital;
+
+    public static function schema(Blueprint $table)
+    {
+        $table->uuid('id')->primary();
+        $table->string('token', 255);
+        $table->text('action');
+        $table->unsignedTinyInteger('num_visits')->default(0);
+        $table->unsignedTinyInteger('max_visits')->nullable();
+        $table->timestamp('available_at')->nullable();
+        $table->string('access_code')->nullable();
+    }
+
+    public function getIncrementing()
+    {
+        return false;
+    }
 
     public function getAccessCode()
     {
@@ -32,8 +52,6 @@ class MagicLink extends Model
     {
         return $this->getKey();
     }
-
-    public $incrementing = false;
 
     protected $keyType = 'string';
 
@@ -220,6 +238,8 @@ class MagicLink extends Model
      */
     public static function deleteAllMagicLink()
     {
-        self::truncate();
+        foreach (self::all() as $e) {
+            $e->delete();
+        }
     }
 }

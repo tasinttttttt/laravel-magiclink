@@ -58,17 +58,17 @@ class ConfigTest extends TestCase
     {
         MagicLink::create(new ResponseAction());
 
-        $action = DB::table('magic_links')->first(['action'])->action;
-
         if (getenv('DB_DRIVER') === 'pgsql') {
+            $action = DB::table('magic_links')->first(['action'])->action;
             $this->assertInstanceOf(
                 ResponseAction::class,
                 unserialize(base64_decode($action))
             );
         } else {
+            $action = MagicLink::first()->action;
             $this->assertInstanceOf(
                 ResponseAction::class,
-                unserialize($action)
+                $action
             );
         }
     }
