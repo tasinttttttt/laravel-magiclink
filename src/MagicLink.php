@@ -25,9 +25,9 @@ use Orbit\Concerns\Orbital;
  */
 class MagicLink extends Model
 {
+    use AccessCode;
+    use Orbital;
     public static $driver = 'json';
-
-    use AccessCode, Orbital;
 
     public static function schema(Blueprint $table)
     {

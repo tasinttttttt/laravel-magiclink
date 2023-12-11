@@ -31,7 +31,7 @@ class MagicLinkServiceProvider extends ServiceProvider
 
     protected function mustLoadRoute()
     {
-        return !config('magiclink.disable_default_route', false);
+        return ! config('magiclink.disable_default_route', false);
     }
 
     /**

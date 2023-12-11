@@ -16,7 +16,9 @@ use Orbit\Concerns\Orbital;
  */
 class User extends Model implements AuthorizableContract, AuthenticatableContract
 {
-    use Authorizable, Authenticatable, Orbital;
+    use Authorizable;
+    use Authenticatable;
+    use Orbital;
     /**
      * The attributes that are mass assignable.
      *

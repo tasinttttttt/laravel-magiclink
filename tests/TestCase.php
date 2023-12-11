@@ -2,11 +2,10 @@
 
 namespace MagicLink\Test;
 
-use Illuminate\Database\Schema\Blueprint;
 use MagicLink\MagicLinkServiceProvider;
 use MagicLink\Test\TestSupport\User;
-use Orchestra\Testbench\TestCase as Orchestra;
 use Orbit\OrbitServiceProvider;
+use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
 {
@@ -45,7 +44,7 @@ abstract class TestCase extends Orchestra
 
         $app['config']->set('filesystems.disks.alternative', [
             'driver' => 'local',
-            'root'   => __DIR__ . '/stubs/storage/app_alternative',
+            'root' => __DIR__ . '/stubs/storage/app_alternative',
         ]);
 
         \Config::set('orbit.paths.content', __DIR__ . '/stubs/storage/app/db');
@@ -53,9 +52,9 @@ abstract class TestCase extends Orchestra
         \Config::set('orbit.default', 'json');
 
         $app['config']->set('database.connections.sqlite', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ]);
 
