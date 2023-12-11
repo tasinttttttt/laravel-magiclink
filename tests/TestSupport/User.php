@@ -11,6 +11,9 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Support\Str;
 use Orbit\Concerns\Orbital;
 
+/**
+ * @property string $email
+ */
 class User extends Model implements AuthorizableContract, AuthenticatableContract
 {
     use Authorizable, Authenticatable, Orbital;
@@ -20,7 +23,7 @@ class User extends Model implements AuthorizableContract, AuthenticatableContrac
      * @var array
      */
     protected $fillable = ['email'];
-    
+
     public static function boot()
     {
         parent::boot();

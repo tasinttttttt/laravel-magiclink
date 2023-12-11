@@ -7,7 +7,7 @@ offer secure content and even log in to the application.
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/cesargb/laravel-magiclink.svg?style=flat-square)](https://packagist.org/packages/cesargb/laravel-magiclink)
 ![tests](https://github.com/cesargb/laravel-magiclink/workflows/tests/badge.svg)
-[![StyleCI](https://github.styleci.io/repos/98337902/shield)](https://github.styleci.io/repos/98337902)
+[![style-fix](https://github.com/cesargb/laravel-magiclink/actions/workflows/style-fix.yml/badge.svg)](https://github.com/cesargb/laravel-magiclink/actions/workflows/style-fix.yml)
 [![Quality Score](https://img.shields.io/scrutinizer/g/cesargb/laravel-magiclink.svg?style=flat-square)](https://scrutinizer-ci.com/g/cesargb/laravel-magiclink)
 [![Total Downloads](https://img.shields.io/packagist/dt/cesargb/laravel-magiclink.svg?style=flat-square)](https://packagist.org/packages/cesargb/laravel-magiclink)
 
@@ -20,7 +20,8 @@ offer secure content and even log in to the application.
   - [Login](#login-action)
   - [Download file](#download-file-action)
   - [View](#view-action)
-  - [Http Reponse](#http-response-action)
+  - [Http Response](#http-response-action)
+  - [Controller](#controller-action)
   - [Custom Action](#custom-action)
 - [Protect with an access code](#protect-with-an-access-code)
 - [Lifetime](#lifetime)
@@ -35,8 +36,19 @@ You can install this package via composer using:
 composer require cesargb/laravel-magiclink
 ```
 
-Note: If you have the version 1 installed,
-[read this](https://github.com/cesargb/laravel-magiclink/blob/v1/README.md).
+### Preparing the database
+
+You need to publish the migration to create the `magic_links` table:
+
+```bash
+php artisan vendor:publish --provider="MagicLink\MagicLinkServiceProvider" --tag="migrations"
+```
+
+After that, you need to run migrations.
+
+```bash
+php artisan migrate
+```
 
 ## Use case
 
@@ -65,7 +77,10 @@ once the link is visited.
 - [Login Action](#login-action)
 - [Download file Action](#download-file-action)
 - [View Action](#view-action)
-- [Http Reponse Action](#http-response-action)
+- [Http Response Action](#http-response-action)
+- [Http Response](#http-response-action)
+- [Controller](#controller-action)
+- [Custom Action](#custom-action)
 
 ### Login Action
 
@@ -96,7 +111,13 @@ $urlShowView = MagicLink::create($action)->url;
 
 // Sample 3; Login in other guard and redirect default
 $action = new LoginAction(User::first());
-$action->guard('customguard')->response(redirect('/api/dashboard'));
+$action->guard('customguard');
+
+$urlShowView = MagicLink::create($action)->url;
+
+// Sample 4; Login and remember me
+$action = new LoginAction(User::first());
+$action->remember();
 
 $urlShowView = MagicLink::create($action)->url;
 ```
@@ -165,6 +186,25 @@ $action = new ResponseAction(function () {
 $urlToCustomFunction = MagicLink::create($action)->url;
 ```
 
+### Controller Action
+
+`MagicLink` can directly call a controller via the `ControllerAction` action.
+
+The constructor requires one argument, the name of the controller class. With
+the second argument can call any controller method, by default it will use the
+`__invoke` method.
+
+```php
+use MagicLink\Actions\ControllerAction;
+use MagicLink\MagicLink;
+
+// Call the method __invoke of the controller
+$url = MagicLink::create(new ControllerAction(MyController::class))->url;
+
+// Call the method show of the controller
+$url = MagicLink::create(new ControllerAction(MyController::class, 'show'))->url;
+```
+
 ### Custom Action
 
 You can create your own action class, for them you just need to extend with
@@ -215,6 +255,18 @@ $magiclink->protectWithAccessCode('secret');
 $urlToSend = $magiclink->url;
 ```
 
+### Custom view for access code
+
+You can customize the view of the access code form with the config file `magiclink.php`:
+
+```php
+'access_code' => [
+    'view' => 'magiclink::access-code', // Change with your view
+],
+```
+
+This is the [default view](/resources/views/ask-for-access-code-form.blade.php)
+
 ## Lifetime
 
 By default a link will be available for 72 hours after your creation. We can
@@ -252,6 +304,7 @@ MagicLink fires two events:
 
 ## Customization
 
+### Config
 To custom this package you can publish the config file:
 
 ```bash
@@ -259,6 +312,17 @@ php artisan vendor:publish --provider="MagicLink\MagicLinkServiceProvider" --tag
 ```
 
 And edit the file `config/magiclink.php`
+
+
+### Migrations
+To customize the migration files of this package you need to publish the migration files:
+
+```bash
+php artisan vendor:publish --provider="MagicLink\MagicLinkServiceProvider" --tag="migrations"
+```
+
+You'll find the published files in `database/migrations/*`
+
 
 ### Custom response when magiclink is invalid
 
@@ -277,6 +341,24 @@ Example:
         'class'   => MagicLink\Responses\Response::class,
         'options' => [
             'content' => 'forbidden',
+            'status' => 403,
+        ],
+    ],
+```
+
+#### Abort
+
+To return a exception and let the framework handle the response,
+use class `MagicLink\Responses\AbortResponse::class`.
+Same `abort()`, you can send the arguments with options.
+
+Example:
+
+```php
+    'invalid_response' => [
+        'class'   => MagicLink\Responses\AbortResponse::class,
+        'options' => [
+            'message' => 'You Shall Not Pass!',
             'status' => 403,
         ],
     ],

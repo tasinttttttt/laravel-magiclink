@@ -1,56 +1,58 @@
 {
-    "name": "cesargb/laravel-magiclink",
-    "description": "Create secure link for access to private data or login in Laravel without password",
-    "keywords": [
-        "laravel",
-        "auth",
-        "login",
-        "link",
-        "download",
-        "file"
-    ],
-    "homepage": "https://github.com/cesargb/laravel-magiclink",
-    "authors": [
+  "name": "cesargb/laravel-magiclink",
+  "description": "Create secure link for access to private data or login in Laravel without password",
+  "keywords": [
+    "laravel",
+    "auth",
+    "login",
+    "link",
+    "download",
+    "file"
+  ],
+  "homepage": "https://github.com/cesargb/laravel-magiclink",
+  "authors": [
     {
-        "name": "Cesar Garcia",
-        "email": "cesargb@gmail.com",
-        "homepage": "https://github.com/cesargb",
-        "role": "Developer"
+      "name": "Cesar Garcia",
+      "email": "cesargb@gmail.com",
+      "homepage": "https://github.com/cesargb",
+      "role": "Developer"
     }
-    ],
-    "license": "MIT",
-    "require": {
-        "illuminate/auth": "^6.0|^8.0|^9.0|^10.0",
-        "illuminate/container": "^6.0|^8.0|^9.0|^10.0",
-        "illuminate/contracts": "^6.0|^8.0|^9.0|^10.0",
-        "illuminate/database": "^6.0|^8.0|^9.0|^10.0",
-        "laravel/serializable-closure": "^1.0",
-        "ryangjchandler/orbit": "^1.1|^1.2"
-    },
-    "autoload": {
-        "psr-4": {
-            "MagicLink\\": "src"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "MagicLink\\Test\\": "tests"
-        }
-    },
-    "scripts": {
-        "test": "vendor/bin/phpunit"
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "MagicLink\\MagicLinkServiceProvider"
-            ]
-        }
-    },
-    "require-dev": {
-        "orchestra/testbench": "^4.0|^6.0|^7.0",
-        "phpunit/phpunit": "^7.0|^9.0"
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+  ],
+  "license": "MIT",
+  "require": {
+    "illuminate/auth": "^6.0|^8.0|^9.0|^10.0",
+    "illuminate/container": "^9.0|^10.0",
+    "illuminate/contracts": "^9.0|^10.0",
+    "illuminate/database": "^9.0|^10.0",
+    "laravel/serializable-closure": "^1.0",
+    "ryangjchandler/orbit": "^1.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "MagicLink\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "MagicLink\\Test\\": "tests"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "MagicLink\\MagicLinkServiceProvider"
+      ]
+    }
+  },
+  "require-dev": {
+    "orchestra/testbench": "^7.0|^8.0",
+    "phpunit/phpunit": "^9.0",
+    "nunomaduro/larastan": "^2.1",
+    "friendsofphp/php-cs-fixer": "^3.9"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }

@@ -18,8 +18,10 @@ use Orbit\Concerns\Orbital;
  * @property string $token
  * @property Carbon|null $available_at
  * @property int|null $max_visits
+ * @property int|null $num_visits
  * @property \MagicLink\Actions\ActionAbstract $action
  * @property-read string $url
+ * @property int|string $access_code
  */
 class MagicLink extends Model
 {
@@ -83,35 +85,36 @@ class MagicLink extends Model
     public function setActionAttribute($value)
     {
         $this->attributes['action'] = $this->getConnection()->getDriverName() === 'pgsql'
-                                        ? base64_encode(serialize($value))
-                                        : serialize($value);
+            ? base64_encode(serialize($value))
+            : serialize($value);
     }
 
     public function getUrlAttribute()
     {
         return url(sprintf(
-            '%s/%s:%s',
+            '%s/%s%s%s',
             config('magiclink.url.validate_path', 'magiclink'),
             $this->id,
+            urlencode(':'),
             $this->token
         ));
     }
 
     /**
-     * Create makiglink.
+     * Create MagicLink.
      *
      * @return self
      */
     public static function create(ActionAbstract $action, ?int $lifetime = 4320, ?int $numMaxVisits = null)
     {
-        self::deleteMagicLinkExpired();
+        static::deleteMagicLinkExpired();
 
         $magiclink = new static();
 
-        $magiclink->token = Str::random(self::getTokenLength());
+        $magiclink->token = Str::random(static::getTokenLength());
         $magiclink->available_at = $lifetime
-                                    ? Carbon::now()->addMinutes($lifetime)
-                                    : null;
+            ? Carbon::now()->addMinutes($lifetime)
+            : null;
         $magiclink->max_visits = $numMaxVisits;
         $magiclink->action = $action;
 
@@ -175,22 +178,22 @@ class MagicLink extends Model
         [$tokenId, $tokenSecret] = explode(':', "{$token}:");
 
         if (empty($tokenSecret)) {
-            return;
+            return null;
         }
 
-        return self::where('id', $tokenId)
-                    ->where('token', $tokenSecret)
-                    ->where(function ($query) {
-                        $query
-                            ->whereNull('available_at')
-                            ->orWhere('available_at', '>=', Carbon::now());
-                    })
-                    ->where(function ($query) {
-                        $query
-                            ->whereNull('max_visits')
-                            ->orWhereRaw('max_visits > num_visits');
-                    })
-                    ->first();
+        return static::where('id', $tokenId)
+            ->where('token', $tokenSecret)
+            ->where(function ($query) {
+                $query
+                    ->whereNull('available_at')
+                    ->orWhere('available_at', '>=', Carbon::now());
+            })
+            ->where(function ($query) {
+                $query
+                    ->whereNull('max_visits')
+                    ->orWhereRaw('max_visits > num_visits');
+            })
+            ->first();
     }
 
     /**
@@ -204,22 +207,22 @@ class MagicLink extends Model
         [$tokenId, $tokenSecret] = explode(':', "{$token}:");
 
         if (empty($tokenSecret)) {
-            return;
+            return null;
         }
 
-        return self::where('id', $tokenId)
-                    ->where('token', $tokenSecret)
-                    ->first();
+        return static::where('id', $tokenId)
+            ->where('token', $tokenSecret)
+            ->first();
     }
 
     /**
-     * Delete magiclink was expired.
+     * Delete MagicLink was expired.
      *
      * @return void
      */
     public static function deleteMagicLinkExpired()
     {
-        self::where(function ($query) {
+        static::where(function ($query) {
             $query
                 ->where('available_at', '<', Carbon::now())
                 ->orWhere(function ($query) {
@@ -228,7 +231,7 @@ class MagicLink extends Model
                         ->whereRaw('max_visits <= num_visits');
                 });
         })
-        ->delete();
+            ->delete();
     }
 
     /**

@@ -14,15 +14,15 @@ class MagicLinkServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/../config/magiclink.php' => config_path('magiclink.php'),
+            __DIR__ . '/../config/magiclink.php' => config_path('magiclink.php'),
         ], 'config');
 
         if ($this->mustLoadRoute()) {
-            $this->loadRoutesFrom(__DIR__.'/routes.php');
+            $this->loadRoutesFrom(__DIR__ . '/../routes/routes.php');
         }
 
         // Views
-        $sourceViewsPath = __DIR__.'/../resources/views';
+        $sourceViewsPath = __DIR__ . '/../resources/views';
         $this->loadViewsFrom($sourceViewsPath, 'magiclink');
         $this->publishes([
             $sourceViewsPath => resource_path('views/vendor/magiclink'),
@@ -31,7 +31,7 @@ class MagicLinkServiceProvider extends ServiceProvider
 
     protected function mustLoadRoute()
     {
-        return ! config('magiclink.disable_default_route', false);
+        return !config('magiclink.disable_default_route', false);
     }
 
     /**

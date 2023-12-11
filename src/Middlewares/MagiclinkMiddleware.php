@@ -11,6 +11,10 @@ class MagiclinkMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
+        if($request->method() === 'HEAD') {
+            return $next($request);
+        }
+
         $token = (string) $request->route('token');
 
         $magicLink = MagicLink::getValidMagicLinkByToken($token);
@@ -34,7 +38,7 @@ class MagiclinkMiddleware
     {
         $responseClass = config('magiclink.invalid_response.class', Response::class);
 
-        $response = new $responseClass;
+        $response = new $responseClass();
 
         return $response(config('magiclink.invalid_response.options', []));
     }

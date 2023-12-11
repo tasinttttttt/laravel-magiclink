@@ -14,7 +14,7 @@ abstract class TestCase extends Orchestra
     {
         parent::setUp();
         $this->withoutExceptionHandling();
-        
+
         $this->setUpDatabase($this->app);
     }
 
@@ -35,23 +35,21 @@ abstract class TestCase extends Orchestra
      *
      * @param  \Illuminate\Foundation\Application  $app
      */
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
-        $app['config']->set('app.key', 'base64:mJlbzP1TMXUPouK3KK6e9zS/VvxtWTfzfVlkn1JTqpM=');
-
         $app['config']->set('auth.providers.users.model', 'MagicLink\Test\TestSupport\User');
 
-        $app['config']->set('view.paths', [__DIR__.'/stubs/resources/views']);
+        $app['config']->set('view.paths', [__DIR__ . '/stubs/resources/views']);
 
-        $app['config']->set('filesystems.disks.local.root', __DIR__.'/stubs/storage/app');
+        $app['config']->set('filesystems.disks.local.root', __DIR__ . '/stubs/storage/app');
 
         $app['config']->set('filesystems.disks.alternative', [
             'driver' => 'local',
-            'root'   => __DIR__.'/stubs/storage/app_alternative',
+            'root'   => __DIR__ . '/stubs/storage/app_alternative',
         ]);
 
-        \Config::set('orbit.paths.content', __DIR__.'/stubs/storage/app/db');
-        \Config::set('orbit.paths.cache', __DIR__.'/stubs/storage/app/cache');
+        \Config::set('orbit.paths.content', __DIR__ . '/stubs/storage/app/db');
+        \Config::set('orbit.paths.cache', __DIR__ . '/stubs/storage/app/cache');
         \Config::set('orbit.default', 'json');
 
         $app['config']->set('database.connections.sqlite', [
@@ -71,20 +69,20 @@ abstract class TestCase extends Orchestra
      */
     protected function setUpDatabase($app)
     {
-        \File::cleanDirectory(__DIR__.'/stubs/storage/app/db');
-        \File::cleanDirectory(__DIR__.'/stubs/storage/app/cache');
+        \File::cleanDirectory(__DIR__ . '/stubs/storage/app/db');
+        \File::cleanDirectory(__DIR__ . '/stubs/storage/app/cache');
 
         $user = User::create(['email' => 'test@user.com']);
     }
 
     protected function loadRoutes()
     {
-        include __DIR__.'/stubs/routes.php';
+        include __DIR__ . '/stubs/routes.php';
     }
 
     public static function tearDownAfterClass(): void
     {
-        \File::deleteDirectory(__DIR__.'/stubs/storage/app/db');
-        \File::deleteDirectory(__DIR__.'/stubs/storage/app/cache');
+        \File::deleteDirectory(__DIR__ . '/stubs/storage/app/db');
+        \File::deleteDirectory(__DIR__ . '/stubs/storage/app/cache');
     }
 }
